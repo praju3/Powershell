@@ -1,0 +1,51 @@
+#  Services Monitoring and TroubleShooting Script
+
+clear
+
+$svs = Get-Service |WHERE {$_.Name -eq "Spooler"}
+
+Add-Type -AssemblyName PresentationCore,PresentationFramework
+
+if($svs.Status -eq "Running"){
+
+
+$MessageboxTitle = “Service Alert”
+$Messageboxbody = “Spooler is running without a problem”
+$MessageIcon = [System.Windows.MessageBoxImage]::Warning
+$ButtonType = [System.Windows.MessageBoxButton]::Ok
+
+$Result = [System.Windows.MessageBox]::Show($Messageboxbody,$MessageboxTitle,$ButtonType,$MessageIcon)
+
+ Write-Host "Mr $Result"
+}
+
+elseif($svs.Status -eq "Stopped"){
+
+
+$MessageboxTitle = “Service Alert”
+$Messageboxbody = “We started the Spooler service and it seems stopped and the Email Alert has been sent”
+$MessageIcon = [System.Windows.MessageBoxImage]::Warning
+$ButtonType = [System.Windows.MessageBoxButton]::Ok
+
+$Result1 = [System.Windows.MessageBox]::Show($Messageboxbody,$MessageboxTitle,$ButtonType,$MessageIcon)
+Start-Service $svs
+
+
+$EmailBody = "It seems the Skype service automatically stopped so script restarted the service "
+$EmailSubject =  "Service Alert"
+$SMTPserver = "192.168.11.4"
+$AdminEmail = "siva@test.com"
+$AlertEmail = "kumar@linux.com"
+$SMTPport   = "25"
+
+Write-Host  $Result1
+
+Send-MailMessage -SmtpServer $SMTPserver -port $SMTPport -Subject $EmailSubject -Body $EmailBody -To $AdminEmail -From $AlertEmail
+
+}
+
+
+
+
+
+
